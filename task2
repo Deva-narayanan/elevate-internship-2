@@ -1,0 +1,85 @@
+-- Task 2: Data Insertion and Handling Nulls
+
+-- INSERTING DATA
+
+-- Insert Authors
+INSERT INTO Authors (name, bio) VALUES 
+('J.K. Rowling', 'Author of the Harry Potter series'),
+('George Orwell', NULL),  -- bio is unknown
+('Jane Austen', 'Renowned author of Pride and Prejudice');
+
+-- Insert Books
+INSERT INTO Books (title, author_id, published_year, genre, copies_available) VALUES
+('Harry Potter and the Sorcerer\'s Stone', 1, 1997, 'Fantasy', 5),
+('1984', 2, 1949, 'Dystopian', 3),
+('Animal Farm', 2, 1945, NULL, 4),  -- genre is NULL
+('Pride and Prejudice', 3, 1813, 'Romance', 2);
+
+-- Insert Members
+INSERT INTO Members (name, email, join_date) VALUES
+('Alice Johnson', 'alice@example.com', CURDATE()),
+('Bob Smith', NULL, CURDATE()),  -- email is unknown
+('Charlie Rose', 'charlie@example.com', CURDATE());
+
+-- Insert Issued Books
+INSERT INTO IssuedBooks (book_id, member_id, issue_date, return_date) VALUES
+(1, 1, CURDATE(), NULL),  -- not yet returned
+(2, 2, CURDATE(), NULL),
+(4, 3, CURDATE(), CURDATE());  -- already returned
+
+
+-- UPDATING DATA
+
+-- Update bio for George Orwell
+UPDATE Authors
+SET bio = 'British author of 1984 and Animal Farm'
+WHERE name = 'George Orwell';
+
+-- Update genre for 'Animal Farm'
+UPDATE Books
+SET genre = 'Political Satire'
+WHERE title = 'Animal Farm';
+
+-- Update Bob Smith's email
+UPDATE Members
+SET email = 'bobsmith@example.com'
+WHERE name = 'Bob Smith';
+
+-- Mark a book as returned
+UPDATE IssuedBooks
+SET return_date = CURDATE()
+WHERE issue_id = 2;
+
+
+-- DELETING DATA
+
+-- Delete a member who has not issued any books
+DELETE FROM Members
+WHERE member_id NOT IN (SELECT DISTINCT member_id FROM IssuedBooks);
+
+-- Delete a book with 0 available copies (assuming one was depleted)
+DELETE FROM Books
+WHERE copies_available = 0;
+
+-- Delete an author who has no books listed
+DELETE FROM Authors
+WHERE author_id NOT IN (SELECT DISTINCT author_id FROM Books);
+
+
+-- HANDLE NULLS - EXAMPLES
+
+-- List all books where genre is missing
+SELECT * FROM Books WHERE genre IS NULL;
+
+-- List all members without an email
+SELECT * FROM Members WHERE email IS NULL;
+
+-- Set missing genre to 'Unknown'
+UPDATE Books
+SET genre = 'Unknown'
+WHERE genre IS NULL;
+
+-- Set default email to 'not_provided@example.com' where missing
+UPDATE Members
+SET email = 'not_provided@example.com'
+WHERE email IS NULL;
